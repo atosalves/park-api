@@ -1,5 +1,7 @@
 package com.atosalves.park_api.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,11 @@ public class UserService {
                 user.setPassword(password);
 
                 return user;
+        }
+
+        @Transactional(readOnly = true)
+        public List<User> getAll() {
+                return userRepository.findAll();
         }
 
 }
