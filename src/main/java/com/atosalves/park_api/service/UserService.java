@@ -15,13 +15,22 @@ public class UserService {
         private final UserRepository userRepository;
 
         @Transactional
-        public User createUser(User user) {
+        public User create(User user) {
                 return userRepository.save(user);
         }
 
         @Transactional(readOnly = true)
-        public User getUserById(Long id) {
+        public User getById(Long id) {
                 return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        }
+
+        @Transactional
+        public User updatePassword(Long id, String password) {
+                var user = getById(id);
+
+                user.setPassword(password);
+
+                return user;
         }
 
 }
