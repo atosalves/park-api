@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.atosalves.park_api.entity.User;
 import com.atosalves.park_api.service.UserService;
+import com.atosalves.park_api.web.controller.dto.mapper.UserMapper;
+import com.atosalves.park_api.web.controller.dto.user.UserCreateDto;
+import com.atosalves.park_api.web.controller.dto.user.UserPasswordDto;
+import com.atosalves.park_api.web.controller.dto.user.UserResponseDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,27 +28,29 @@ public class UserController {
         private final UserService userService;
 
         @PostMapping
-        public ResponseEntity<User> create(@RequestBody User user) {
-                var createdUser = userService.create(user);
-                return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        public ResponseEntity<UserResponseDto> create(@RequestBody UserCreateDto createDto) {
+                var user = userService.create(UserMapper.toUser(createDto));
+                return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(user));
         }
 
         @GetMapping("/{id}")
-        public ResponseEntity<User> getById(@PathVariable Long id) {
+        public ResponseEntity<UserResponseDto> getById(@PathVariable Long id) {
                 var user = userService.getById(id);
-                return ResponseEntity.ok(user);
+                return ResponseEntity.ok(UserMapper.toDto(user));
         }
 
         @PatchMapping("/{id}")
-        public ResponseEntity<User> updatePassword(@PathVariable Long id, @RequestBody User user) {
-                var updatedUser = userService.updatePassword(id, user.getPassword());
-                return ResponseEntity.ok(updatedUser);
+        public ResponseEntity<Void> updatePassword(@PathVariable Long id,
+                        @RequestBody UserPasswordDto passwordDto) {
+                userService.updatePassword(id, passwordDto.currentPassword(),
+                                passwordDto.updatedPassword(), passwordDto.confirmedPassword());
+                return ResponseEntity.noContent().build();
         }
 
         @GetMapping
-        public ResponseEntity<List<User>> getAll() {
+        public ResponseEntity<List<UserResponseDto>> getAll() {
                 var users = userService.getAll();
-                return ResponseEntity.ok(users);
+                return ResponseEntity.ok(UserMapper.toListDto(users));
         }
 
 }
