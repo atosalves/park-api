@@ -27,12 +27,19 @@ public class UserService {
         }
 
         @Transactional
-        public User updatePassword(Long id, String password) {
+        public void updatePassword(Long id, String currentPassword, String updatedPassword, String confirmedPassword) {
+
+                if (updatedPassword.equals(confirmedPassword)) {
+                        throw new RuntimeException("Nova senha não é igual a senha de confirmação");
+                }
+
                 var user = getById(id);
 
-                user.setPassword(password);
+                if (user.getPassword().equals(currentPassword)) {
+                        throw new RuntimeException("Senha não confere");
+                }
 
-                return user;
+                user.setPassword(updatedPassword);
         }
 
         @Transactional(readOnly = true)
