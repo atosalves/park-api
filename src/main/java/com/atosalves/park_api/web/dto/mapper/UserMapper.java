@@ -1,11 +1,11 @@
-package com.atosalves.park_api.web.controller.dto.mapper;
+package com.atosalves.park_api.web.dto.mapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.atosalves.park_api.entity.User;
-import com.atosalves.park_api.web.controller.dto.user.UserCreateDto;
-import com.atosalves.park_api.web.controller.dto.user.UserResponseDto;
+import com.atosalves.park_api.web.dto.user.UserCreateDto;
+import com.atosalves.park_api.web.dto.user.UserResponseDto;
 
 public class UserMapper {
 

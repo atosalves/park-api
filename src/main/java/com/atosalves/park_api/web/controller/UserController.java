@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.atosalves.park_api.service.UserService;
-import com.atosalves.park_api.web.controller.dto.mapper.UserMapper;
-import com.atosalves.park_api.web.controller.dto.user.UserCreateDto;
-import com.atosalves.park_api.web.controller.dto.user.UserPasswordDto;
-import com.atosalves.park_api.web.controller.dto.user.UserResponseDto;
+import com.atosalves.park_api.web.dto.mapper.UserMapper;
+import com.atosalves.park_api.web.dto.user.UserCreateDto;
+import com.atosalves.park_api.web.dto.user.UserPasswordDto;
+import com.atosalves.park_api.web.dto.user.UserResponseDto;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class UserController {
         private final UserService userService;
 
         @PostMapping
-        public ResponseEntity<UserResponseDto> create(@RequestBody UserCreateDto createDto) {
+        public ResponseEntity<UserResponseDto> create(@Valid @RequestBody UserCreateDto createDto) {
                 var user = userService.create(UserMapper.toUser(createDto));
                 return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(user));
         }
@@ -41,7 +42,7 @@ public class UserController {
 
         @PatchMapping("/{id}")
         public ResponseEntity<Void> updatePassword(@PathVariable Long id,
-                        @RequestBody UserPasswordDto passwordDto) {
+                        @Valid @RequestBody UserPasswordDto passwordDto) {
                 userService.updatePassword(id, passwordDto.currentPassword(),
                                 passwordDto.updatedPassword(), passwordDto.confirmedPassword());
                 return ResponseEntity.noContent().build();
