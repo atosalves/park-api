@@ -3,6 +3,8 @@ package com.atosalves.park_api.web.dto.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.BeanUtils;
+
 import com.atosalves.park_api.entity.User;
 import com.atosalves.park_api.web.dto.user.UserCreateDto;
 import com.atosalves.park_api.web.dto.user.UserResponseDto;
@@ -11,7 +13,7 @@ public class UserMapper {
 
         public static User toUser(UserCreateDto createDto) {
                 var user = new User();
-
+                BeanUtils.copyProperties(createDto, user);
                 return user;
         }
 
