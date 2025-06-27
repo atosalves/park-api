@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.atosalves.park_api.entity.User;
 import com.atosalves.park_api.exception.EntityNotFoundException;
-import com.atosalves.park_api.exception.PasswordInvalidException;
+import com.atosalves.park_api.exception.InvalidPasswordException;
 import com.atosalves.park_api.exception.UniqueViolationException;
 import com.atosalves.park_api.repository.UserRepository;
 
@@ -38,14 +38,14 @@ public class UserService {
         @Transactional
         public void updatePassword(Long id, String currentPassword, String updatedPassword, String confirmedPassword) {
 
-                if (updatedPassword.equals(confirmedPassword)) {
-                        throw new PasswordInvalidException("Nova senha não é igual a senha de confirmação");
+                if (!updatedPassword.equals(confirmedPassword)) {
+                        throw new InvalidPasswordException("Nova senha não é igual a senha de confirmação");
                 }
 
                 var user = getById(id);
 
-                if (user.getPassword().equals(currentPassword)) {
-                        throw new PasswordInvalidException("Senha não confere");
+                if (!user.getPassword().equals(currentPassword)) {
+                        throw new InvalidPasswordException("Senha não confere");
                 }
 
                 user.setPassword(updatedPassword);
