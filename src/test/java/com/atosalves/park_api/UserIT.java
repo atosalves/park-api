@@ -8,6 +8,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.atosalves.park_api.web.dto.user.UserCreateDto;
+import com.atosalves.park_api.web.dto.user.UserPasswordDto;
 import com.atosalves.park_api.web.dto.user.UserResponseDto;
 import com.atosalves.park_api.web.exception.ErrorMessage;
 
@@ -139,7 +140,7 @@ public class UserIT {
         }
 
         @Test
-        public void getById_InvalidId_ReturnUserByIdWith200StatusCode() {
+        public void getById_InvalidId_ReturnErrorMessageWithNotFoundStatus() {
                 var responseBody = webTestClient
                                 .get()
                                 .uri("/api/v1/users/0")
@@ -154,4 +155,133 @@ public class UserIT {
                 assertEquals(404, responseBody.getStatus());
         }
 
+        @Test
+        public void updatePassword_ValidPasswords_ReturnNoContentStatus() {
+                webTestClient
+                                .patch()
+                                .uri("/api/v1/users/100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new UserPasswordDto("123456", "654321", "654321"))
+                                .exchange()
+                                .expectStatus()
+                                .isNoContent();
+        }
+
+        @Test
+        public void updatePassword_InvalidPasswords_ReturnErrorMessageWithBadRequestStatus() {
+                var statusCode = 400;
+
+                var responseBody = webTestClient
+                                .patch()
+                                .uri("/api/v1/users/100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new UserPasswordDto("wrongCurrentPassword", "654321", "654321"))
+                                .exchange()
+                                .expectStatus()
+                                .isBadRequest()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(statusCode, responseBody.getStatus());
+
+                responseBody = webTestClient
+                                .patch()
+                                .uri("/api/v1/users/100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new UserPasswordDto("123456", "654321", "wrongConfirmedPassword"))
+                                .exchange()
+                                .expectStatus()
+                                .isBadRequest()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(statusCode, responseBody.getStatus());
+        }
+
+        @Test
+        public void updatePassword_InvalidId_ReturnErrorMessageWithNotFoundStatus() {
+                var responseBody = webTestClient
+                                .patch()
+                                .uri("/api/v1/users/0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new UserPasswordDto("123456", "654321", "654321"))
+                                .exchange()
+                                .expectStatus()
+                                .isNotFound()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(404, responseBody.getStatus());
+        }
+
+        @Test
+        public void updatePassword_InvalidInputs_ReturnErrorMessageWith422StatusCode() {
+                var statusCode = 422;
+
+                var responseBody = webTestClient
+                                .patch()
+                                .uri("/api/v1/users/100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new UserPasswordDto("", "654321", "654321"))
+                                .exchange()
+                                .expectStatus()
+                                .isEqualTo(statusCode)
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(statusCode, responseBody.getStatus());
+
+                responseBody = webTestClient
+                                .patch()
+                                .uri("/api/v1/users/100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new UserPasswordDto("123456", "654321", ""))
+                                .exchange()
+                                .expectStatus()
+                                .isEqualTo(statusCode)
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(statusCode, responseBody.getStatus());
+                responseBody = webTestClient
+                                .patch()
+                                .uri("/api/v1/users/100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new UserPasswordDto("123456", "", "654321"))
+                                .exchange()
+                                .expectStatus()
+                                .isEqualTo(statusCode)
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(statusCode, responseBody.getStatus());
+        }
+
+        @Test
+        public void getAll_ReturnUserListWithOkStatus() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/users")
+                                .exchange()
+                                .expectStatus()
+                                .isOk()
+                                .expectBodyList(UserResponseDto.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(3, responseBody.size());
+        }
 }
