@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.atosalves.park_api.exception.EntityNotFoundException;
-import com.atosalves.park_api.exception.PasswordInvalidException;
+import com.atosalves.park_api.exception.InvalidPasswordException;
 import com.atosalves.park_api.exception.UniqueViolationException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,8 +53,8 @@ public class ApiExceptionHandler {
                                                 exception.getMessage()));
         }
 
-        @ExceptionHandler(PasswordInvalidException.class)
-        public ResponseEntity<ErrorMessage> passwordInvalidException(PasswordInvalidException exception,
+        @ExceptionHandler(InvalidPasswordException.class)
+        public ResponseEntity<ErrorMessage> passwordInvalidException(InvalidPasswordException exception,
                         HttpServletRequest request) {
                 log.error("Api Error - ", exception);
                 return ResponseEntity
