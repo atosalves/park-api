@@ -23,7 +23,7 @@ public class UserIT {
         WebTestClient webTestClient;
 
         @Test
-        public void createUser_ValidUsernameAndPassword_ReturnCreatedUserWith201StatusCode() {
+        public void create_ValidUsernameAndPassword_ReturnCreatedUserWith201StatusCode() {
                 var username = "test";
 
                 var responseBody = webTestClient
@@ -49,7 +49,7 @@ public class UserIT {
         }
 
         @Test
-        public void createUser_InvalidUsername_ReturnErrorMessageWith422StatusCode() {
+        public void create_InvalidUsername_ReturnErrorMessageWith422StatusCode() {
                 var statusCode = 422;
                 var responseBody = webTestClient
                                 .post()
@@ -68,7 +68,7 @@ public class UserIT {
         }
 
         @Test
-        public void createUser_InvalidPassword_ReturnErrorMessageWith422StatusCode() {
+        public void create_InvalidPassword_ReturnErrorMessageWith422StatusCode() {
                 var statusCode = 422;
                 var responseBody = webTestClient
                                 .post()
@@ -102,7 +102,7 @@ public class UserIT {
         }
 
         @Test
-        public void createUser_RepeatedUsername_ReturnErrorMessageWithBadRequestCode() {
+        public void create_RepeatedUsername_ReturnErrorMessageWith409StatusCode() {
                 var statusCode = 409;
                 var responseBody = webTestClient
                                 .post()
@@ -119,4 +119,39 @@ public class UserIT {
                 assertNotNull(responseBody);
                 assertEquals(statusCode, responseBody.getStatus());
         }
+
+        @Test
+        public void getById_ValidId_ReturnUserByIdWith200StatusCode() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/users/100")
+                                .exchange()
+                                .expectStatus()
+                                .isOk()
+                                .expectBody(UserResponseDto.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(100L, responseBody.id());
+                assertEquals("test1", responseBody.username());
+                assertEquals("ADMIN", responseBody.role());
+        }
+
+        @Test
+        public void getById_InvalidId_ReturnUserByIdWith200StatusCode() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/users/0")
+                                .exchange()
+                                .expectStatus()
+                                .isNotFound()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(404, responseBody.getStatus());
+        }
+
 }
