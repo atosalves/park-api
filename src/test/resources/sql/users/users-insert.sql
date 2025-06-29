@@ -1,3 +1,3 @@
-INSERT INTO users (id, username, password, role) VALUES (100, 'test1', '123456', 'ROLE_ADMIN');
-INSERT INTO users (id, username, password, role) VALUES (101, 'test2', '123456', 'ROLE_CUSTOMER');
-INSERT INTO users (id, username, password, role) VALUES (102, 'test3', '123456', 'ROLE_CUSTOMER');
+INSERT INTO users (id, username, password, role) VALUES (100, 'admin', '$2a$12$nvMTZTvWXQN31RHT1H5hNu6C.chnNGV26xgfkSgyFR3JKJ/h300XG', 'ROLE_ADMIN');
+INSERT INTO users (id, username, password, role) VALUES (101, 'customer', '$2a$12$nvMTZTvWXQN31RHT1H5hNu6C.chnNGV26xgfkSgyFR3JKJ/h300XG', 'ROLE_CUSTOMER');
+INSERT INTO users (id, username, password, role) VALUES (102, 'customer2', '$2a$12$nvMTZTvWXQN31RHT1H5hNu6C.chnNGV26xgfkSgyFR3JKJ/h300XG', 'ROLE_CUSTOMER');
