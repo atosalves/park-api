@@ -34,6 +34,8 @@ public class SpringSecurityConfig {
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
+                                .exceptionHandling(handler -> handler
+                                                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                                 .build();
         }
 
