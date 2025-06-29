@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,12 +36,14 @@ public class UserController {
         }
 
         @GetMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN') OR (hasRole('CUSTOMER') AND #id == authentication.principal.id)")
         public ResponseEntity<UserResponseDto> getById(@PathVariable Long id) {
                 var user = userService.getById(id);
                 return ResponseEntity.ok(UserMapper.toDto(user));
         }
 
         @PatchMapping("/{id}")
+        @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER') AND #id == authentication.principal.id")
         public ResponseEntity<Void> updatePassword(@PathVariable Long id,
                         @Valid @RequestBody UserPasswordDto passwordDto) {
                 userService.updatePassword(id, passwordDto.currentPassword(),
@@ -49,6 +52,7 @@ public class UserController {
         }
 
         @GetMapping
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<List<UserResponseDto>> getAll() {
                 var users = userService.getAll();
                 return ResponseEntity.ok(UserMapper.toListDto(users));
