@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import com.atosalves.park_api.web.dto.TokenDto;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -24,7 +26,7 @@ public class JwtUtils {
         public static final Long EXPIRE_HOURS = 0L;
         public static final Long EXPIRE_MINUTES = 2L;
 
-        public static JwtToken createToken(String username, String role) {
+        public static TokenDto createToken(String username, String role) {
                 var issuedAt = new Date();
                 var limit = toExpireDate(issuedAt);
 
@@ -39,7 +41,7 @@ public class JwtUtils {
                                 .signWith(generateKey())
                                 .compact();
 
-                return new JwtToken(token);
+                return new TokenDto(token);
         }
 
         public static String getUsernameFromToken(String token) {
