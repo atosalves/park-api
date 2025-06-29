@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.atosalves.park_api.entity.User;
 import com.atosalves.park_api.service.UserService;
+import com.atosalves.park_api.web.dto.TokenDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +23,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                 return new JwtUserDetails(user);
         }
 
-        public JwtToken getTokenAuthenticated(String username) {
+        public TokenDto getTokenAuthenticated(String username) {
                 User.Role role = userService.getRoleByUsername(username);
                 return JwtUtils.createToken(username, role.name().substring("ROLE_".length()));
         }
