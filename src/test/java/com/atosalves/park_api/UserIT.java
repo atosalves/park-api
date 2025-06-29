@@ -109,7 +109,7 @@ public class UserIT {
                                 .post()
                                 .uri("/api/v1/users")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(new UserCreateDto("test1", "123456"))
+                                .bodyValue(new UserCreateDto("admin", "123456"))
                                 .exchange()
                                 .expectStatus()
                                 .isEqualTo(statusCode)
@@ -126,6 +126,7 @@ public class UserIT {
                 var responseBody = webTestClient
                                 .get()
                                 .uri("/api/v1/users/100")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
                                 .exchange()
                                 .expectStatus()
                                 .isOk()
@@ -135,8 +136,41 @@ public class UserIT {
 
                 assertNotNull(responseBody);
                 assertEquals(100L, responseBody.id());
-                assertEquals("test1", responseBody.username());
+                assertEquals("admin", responseBody.username());
                 assertEquals("ADMIN", responseBody.role());
+
+                responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/users/101")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isOk()
+                                .expectBody(UserResponseDto.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(101L, responseBody.id());
+                assertEquals("customer", responseBody.username());
+                assertEquals("CUSTOMER", responseBody.role());
+
+                responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/users/101")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "customer", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isOk()
+                                .expectBody(UserResponseDto.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(101L, responseBody.id());
+                assertEquals("customer", responseBody.username());
+                assertEquals("CUSTOMER", responseBody.role());
+
         }
 
         @Test
@@ -144,6 +178,7 @@ public class UserIT {
                 var responseBody = webTestClient
                                 .get()
                                 .uri("/api/v1/users/0")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
                                 .exchange()
                                 .expectStatus()
                                 .isNotFound()
@@ -156,10 +191,37 @@ public class UserIT {
         }
 
         @Test
+        public void getById_InvalidId_ReturnErrorMessageWithForbbidenStatus() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/users/100")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "customer", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isForbidden()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(403, responseBody.getStatus());
+        }
+
+        @Test
         public void updatePassword_ValidPasswords_ReturnNoContentStatus() {
                 webTestClient
                                 .patch()
                                 .uri("/api/v1/users/100")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new UserPasswordDto("123456", "654321", "654321"))
+                                .exchange()
+                                .expectStatus()
+                                .isNoContent();
+                webTestClient
+                                .patch()
+                                .uri("/api/v1/users/101")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "customer", "123456"))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(new UserPasswordDto("123456", "654321", "654321"))
                                 .exchange()
@@ -174,6 +236,7 @@ public class UserIT {
                 var responseBody = webTestClient
                                 .patch()
                                 .uri("/api/v1/users/100")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(new UserPasswordDto("wrongCurrentPassword", "654321", "654321"))
                                 .exchange()
@@ -189,6 +252,7 @@ public class UserIT {
                 responseBody = webTestClient
                                 .patch()
                                 .uri("/api/v1/users/100")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(new UserPasswordDto("123456", "654321", "wrongConfirmedPassword"))
                                 .exchange()
@@ -203,21 +267,38 @@ public class UserIT {
         }
 
         @Test
-        public void updatePassword_InvalidId_ReturnErrorMessageWithNotFoundStatus() {
+        public void updatePassword_InvalidId_ReturnErrorMessageWithForbbidenStatus() {
                 var responseBody = webTestClient
                                 .patch()
                                 .uri("/api/v1/users/0")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(new UserPasswordDto("123456", "654321", "654321"))
                                 .exchange()
                                 .expectStatus()
-                                .isNotFound()
+                                .isForbidden()
                                 .expectBody(ErrorMessage.class)
                                 .returnResult()
                                 .getResponseBody();
 
                 assertNotNull(responseBody);
-                assertEquals(404, responseBody.getStatus());
+                assertEquals(403, responseBody.getStatus());
+
+                responseBody = webTestClient
+                                .patch()
+                                .uri("/api/v1/users/0")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "customer", "123456"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new UserPasswordDto("123456", "654321", "654321"))
+                                .exchange()
+                                .expectStatus()
+                                .isForbidden()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(403, responseBody.getStatus());
         }
 
         @Test
@@ -227,6 +308,7 @@ public class UserIT {
                 var responseBody = webTestClient
                                 .patch()
                                 .uri("/api/v1/users/100")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(new UserPasswordDto("", "654321", "654321"))
                                 .exchange()
@@ -242,6 +324,7 @@ public class UserIT {
                 responseBody = webTestClient
                                 .patch()
                                 .uri("/api/v1/users/100")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(new UserPasswordDto("123456", "654321", ""))
                                 .exchange()
@@ -253,9 +336,11 @@ public class UserIT {
 
                 assertNotNull(responseBody);
                 assertEquals(statusCode, responseBody.getStatus());
+
                 responseBody = webTestClient
                                 .patch()
                                 .uri("/api/v1/users/100")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(new UserPasswordDto("123456", "", "654321"))
                                 .exchange()
@@ -270,10 +355,11 @@ public class UserIT {
         }
 
         @Test
-        public void getAll_ReturnUserListWithOkStatus() {
+        public void getAll_AsAdminRole_ReturnUserListWithOkStatus() {
                 var responseBody = webTestClient
                                 .get()
                                 .uri("/api/v1/users")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
                                 .exchange()
                                 .expectStatus()
                                 .isOk()
@@ -283,5 +369,22 @@ public class UserIT {
 
                 assertNotNull(responseBody);
                 assertEquals(3, responseBody.size());
+        }
+
+        @Test
+        public void getAll_AsCustomerRole_ReturnErrorMessageWithForbbidenStatus() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/users")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "customer", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isForbidden()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(403, responseBody.getStatus());
         }
 }
