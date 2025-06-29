@@ -3,6 +3,12 @@ package com.atosalves.park_api.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,10 +38,16 @@ public class User implements Serializable {
         @Column(nullable = false, length = 25)
         private Role role = Role.ROLE_CUSTOMER;
 
+        @CreatedDate
         private LocalDateTime createdAt;
+
+        @LastModifiedDate
         private LocalDateTime updatedAt;
 
+        @CreatedBy
         private String createBy;
+
+        @LastModifiedBy
         private String updatedBy;
 
         public enum Role {
