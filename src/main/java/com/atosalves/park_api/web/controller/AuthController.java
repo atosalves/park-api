@@ -1,16 +1,18 @@
 package com.atosalves.park_api.web.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.atosalves.park_api.jwt.JwtUserDetailsService;
-import com.atosalves.park_api.web.dto.TokenDto;
 import com.atosalves.park_api.web.dto.user.UserLoginDto;
+import com.atosalves.park_api.web.exception.ErrorMessage;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -27,16 +29,24 @@ public class AuthController {
         private final AuthenticationManager authenticationManager;
 
         @PostMapping("/auth")
-        public ResponseEntity<TokenDto> login(@Valid @RequestBody UserLoginDto loginDto, HttpServletRequest request) {
-                var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                                loginDto.username(),
-                                loginDto.password());
+        public ResponseEntity<?> login(@Valid @RequestBody UserLoginDto loginDto, HttpServletRequest request) {
 
-                authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+                try {
+                        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                                        loginDto.username(),
+                                        loginDto.password());
 
-                var token = jwtUserDetailsService.getTokenAuthenticated(loginDto.username());
+                        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-                return ResponseEntity.ok(token);
+                        var token = jwtUserDetailsService.getTokenAuthenticated(loginDto.username());
+
+                        return ResponseEntity.ok(token);
+                } catch (AuthenticationException e) {
+                        log.warn("Credenciais inválidas");
+                }
+                return ResponseEntity
+                                .badRequest()
+                                .body(new ErrorMessage(request, HttpStatus.BAD_REQUEST, "Credenciais inválidas"));
         }
 
 }
