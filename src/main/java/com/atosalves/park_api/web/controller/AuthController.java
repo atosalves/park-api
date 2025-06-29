@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.atosalves.park_api.jwt.JwtToken;
 import com.atosalves.park_api.jwt.JwtUserDetailsService;
+import com.atosalves.park_api.web.dto.TokenDto;
 import com.atosalves.park_api.web.dto.user.UserLoginDto;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class AuthController {
         private final AuthenticationManager authenticationManager;
 
         @PostMapping("/auth")
-        public ResponseEntity<JwtToken> login(@Valid @RequestBody UserLoginDto loginDto, HttpServletRequest request) {
+        public ResponseEntity<TokenDto> login(@Valid @RequestBody UserLoginDto loginDto, HttpServletRequest request) {
                 var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                                 loginDto.username(),
                                 loginDto.password());
