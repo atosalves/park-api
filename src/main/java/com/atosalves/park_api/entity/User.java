@@ -45,7 +45,7 @@ public class User implements Serializable {
         private LocalDateTime updatedAt;
 
         @CreatedBy
-        private String createBy;
+        private String createdBy;
 
         @LastModifiedBy
         private String updatedBy;
