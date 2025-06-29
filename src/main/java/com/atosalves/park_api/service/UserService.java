@@ -2,10 +2,12 @@ package com.atosalves.park_api.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.atosalves.park_api.entity.User;
+import com.atosalves.park_api.entity.User.Role;
 import com.atosalves.park_api.exception.EntityNotFoundException;
 import com.atosalves.park_api.exception.InvalidPasswordException;
 import com.atosalves.park_api.exception.UniqueViolationException;
@@ -18,10 +20,13 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
         private final UserRepository userRepository;
+        private final PasswordEncoder passwordEncoder;
 
         @Transactional
         public User create(User user) {
                 try {
+                        var encodedPassword = passwordEncoder.encode(user.getPassword());
+                        user.setPassword(encodedPassword);
                         return userRepository.save(user);
                 } catch (Exception e) {
                         throw new UniqueViolationException(
@@ -44,16 +49,29 @@ public class UserService {
 
                 var user = getById(id);
 
-                if (!user.getPassword().equals(currentPassword)) {
+                if (!passwordEncoder.matches(updatedPassword, user.getPassword())) {
                         throw new InvalidPasswordException("Senha não confere");
                 }
-
-                user.setPassword(updatedPassword);
+                var encodedPassword = passwordEncoder.encode(updatedPassword);
+                user.setPassword(encodedPassword);
         }
 
         @Transactional(readOnly = true)
         public List<User> getAll() {
                 return userRepository.findAll();
+        }
+
+        @Transactional(readOnly = true)
+        public User getByUsername(String username) {
+                return userRepository.findByUsername(username).orElseThrow(
+                                () -> new EntityNotFoundException(
+                                                String.format("Usuário '%s' não encontrado", username)));
+        }
+
+        @Transactional(readOnly = true)
+        public Role getRoleByUsername(String username) {
+                return userRepository.findRoleByUsername(username);
+
         }
 
 }
