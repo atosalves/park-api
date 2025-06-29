@@ -49,7 +49,7 @@ public class UserService {
 
                 var user = getById(id);
 
-                if (!passwordEncoder.matches(updatedPassword, user.getPassword())) {
+                if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
                         throw new InvalidPasswordException("Senha não confere");
                 }
                 var encodedPassword = passwordEncoder.encode(updatedPassword);
