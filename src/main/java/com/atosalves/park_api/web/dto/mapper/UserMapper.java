@@ -9,6 +9,10 @@ import com.atosalves.park_api.entity.User;
 import com.atosalves.park_api.web.dto.user.UserCreateDto;
 import com.atosalves.park_api.web.dto.user.UserResponseDto;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserMapper {
 
         public static User toUser(UserCreateDto createDto) {
