@@ -1,8 +1,5 @@
 package com.atosalves.park_api.web.dto.mapper;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.BeanUtils;
 
 import com.atosalves.park_api.entity.Customer;
@@ -25,8 +22,4 @@ public class CustomerMapper {
                 return new CustomerResponseDto(customer.getId(), customer.getName(), customer.getCpf());
         }
 
-        public static List<CustomerResponseDto> toListDto(List<Customer> customers) {
-                return customers.stream().map(customer -> toDto(customer))
-                                .collect(Collectors.toList());
-        }
 }
