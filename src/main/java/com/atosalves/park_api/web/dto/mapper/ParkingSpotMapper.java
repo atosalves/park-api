@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ParkingSpotMapper {
 
-        public static ParkingSpot toUser(ParkingSpotCreateDto createDto) {
+        public static ParkingSpot toParkingSpot(ParkingSpotCreateDto createDto) {
                 var parkingSpot = new ParkingSpot();
                 BeanUtils.copyProperties(createDto, parkingSpot);
                 return parkingSpot;
