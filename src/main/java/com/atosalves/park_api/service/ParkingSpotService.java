@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.atosalves.park_api.entity.ParkingSpot;
+import com.atosalves.park_api.exception.EntityNotFoundException;
 import com.atosalves.park_api.exception.UniqueViolationException;
 import com.atosalves.park_api.repository.ParkingSpotRepository;
 
@@ -24,6 +25,12 @@ public class ParkingSpotService {
                         throw new UniqueViolationException(
                                         String.format("Código '%s' já cadastrado", parkingSpot.getCode()));
                 }
+        }
+
+        @Transactional(readOnly = true)
+        public ParkingSpot getByCode(String code) {
+                return parkingSpotRepository.findByCode(code).orElseThrow(
+                                () -> new EntityNotFoundException(String.format("Vaga '%s' não encontrada", code)));
         }
 
 }
