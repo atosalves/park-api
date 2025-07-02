@@ -1,7 +1,5 @@
 package com.atosalves.park_api.web.dto.mapper;
 
-import org.springframework.beans.BeanUtils;
-
 import com.atosalves.park_api.entity.ParkingSpot;
 import com.atosalves.park_api.web.dto.parkingSpot.ParkingSpotCreateDto;
 import com.atosalves.park_api.web.dto.parkingSpot.ParkingSpotResponseDto;
@@ -14,7 +12,10 @@ public class ParkingSpotMapper {
 
         public static ParkingSpot toParkingSpot(ParkingSpotCreateDto createDto) {
                 var parkingSpot = new ParkingSpot();
-                BeanUtils.copyProperties(createDto, parkingSpot);
+
+                parkingSpot.setCode(createDto.code());
+                parkingSpot.setStatus(ParkingSpot.StatusParkingSpot.valueOf(createDto.status()));
+
                 return parkingSpot;
         }
 
