@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ParkingSpotService {
 
-        private ParkingSpotRepository parkingSpotRepository;
+        private final ParkingSpotRepository parkingSpotRepository;
 
         @Transactional
         public ParkingSpot create(ParkingSpot parkingSpot) {
