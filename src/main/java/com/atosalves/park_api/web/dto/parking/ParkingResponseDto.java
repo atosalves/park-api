@@ -15,9 +15,9 @@ public record ParkingResponseDto(
 
                 String parkingSpotCode,
 
-                @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss") LocalDateTime entryAt,
+                @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime entryAt,
 
-                @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss") LocalDateTime exitAt,
+                @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime exitAt,
 
                 BigDecimal price,
 
