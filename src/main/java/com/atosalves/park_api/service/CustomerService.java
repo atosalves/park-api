@@ -45,4 +45,11 @@ public class CustomerService {
                 return customerRepository.findByUserId(id);
         }
 
+        @Transactional(readOnly = true)
+        public Customer getByCpf(String cpf) {
+                return customerRepository.findByCpf(cpf).orElseThrow(
+                                () -> new EntityNotFoundException(
+                                                String.format("Cliente do CPF '%s' não encontrado", cpf)));
+        }
+
 }
