@@ -6,5 +6,5 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record CustomerCreateDto(@NotBlank @Size(min = 3, max = 100) String name,
-                @CPF @Size(max = 11) String cpf) {
+                @NotBlank @CPF @Size(max = 11) String cpf) {
 }
