@@ -33,4 +33,10 @@ public class ParkingSpotService {
                                 () -> new EntityNotFoundException(String.format("Vaga '%s' não encontrada", code)));
         }
 
+        @Transactional(readOnly = true)
+        public ParkingSpot getByAvailableParkingSpot() {
+                return parkingSpotRepository.findFirstByStatus(ParkingSpot.StatusParkingSpot.AVAILABLE).orElseThrow(
+                                () -> new EntityNotFoundException("Nenhuma vaga livre foi não encontrada"));
+        }
+
 }
