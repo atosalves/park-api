@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import com.atosalves.park_api.web.dto.PageableDto;
 import com.atosalves.park_api.web.dto.parking.ParkingCreateDto;
 import com.atosalves.park_api.web.dto.parking.ParkingResponseDto;
 import com.atosalves.park_api.web.exception.ErrorMessage;
@@ -126,6 +127,157 @@ public class ParkingIT {
 
                 assertNotNull(responseBody);
                 assertEquals(404, responseBody.getStatus());
+        }
+
+        @Test
+        public void getByReceipt_ValidReceipt_ReturnCustomerParkingSpotWithOkStatus() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/parkings/check-in/{receipt}", "AAA-1111-20250102-000000")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isOk()
+                                .expectBody(ParkingResponseDto.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertNotNull(responseBody.parkingSpotCode());
+                assertNotNull(responseBody.receipt());
+
+                assertEquals("77115870071", responseBody.customerCpf());
+                assertEquals("Celta", responseBody.model());
+
+                responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/parkings/check-in/{receipt}", "AAA-1111-20250102-000000")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "customer", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isOk()
+                                .expectBody(ParkingResponseDto.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertNotNull(responseBody.parkingSpotCode());
+                assertNotNull(responseBody.receipt());
+
+                assertEquals("77115870071", responseBody.customerCpf());
+                assertEquals("Celta", responseBody.model());
+        }
+
+        @Test
+        public void getByReceipt_InvalidReceipt_ReturnErrorMessageWithNotFoundStatus() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/parkings/check-in/{receipt}", "000-0000-00000000-000000")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isNotFound()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(404, responseBody.getStatus());
+        }
+
+        @Test
+        public void checkOut_ValidReceipt_ReturnCustomerParkingSpotWithOkStatus() {
+                var responseBody = webTestClient
+                                .put()
+                                .uri("/api/v1/parkings/check-out/{receipt}", "AAA-1111-20250102-000000")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isOk()
+                                .expectBody(ParkingResponseDto.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertNotNull(responseBody.parkingSpotCode());
+                assertNotNull(responseBody.receipt());
+                assertNotNull(responseBody.exitAt());
+                assertNotNull(responseBody.price());
+                assertNotNull(responseBody.descount());
+
+                assertEquals("77115870071", responseBody.customerCpf());
+                assertEquals("Celta", responseBody.model());
+        }
+
+        @Test
+        public void checkOut_InvalidReceipt_ReturnErrorMessageWithNotFoundStatus() {
+                var responseBody = webTestClient
+                                .put()
+                                .uri("/api/v1/parkings/check-out/{receipt}", "000-0000-00000000-000000")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isNotFound()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(404, responseBody.getStatus());
+        }
+
+        @Test
+        public void checkOut_AsCustomer_ReturnErrorMessageWithForbbidenStatus() {
+                var responseBody = webTestClient
+                                .put()
+                                .uri("/api/v1/parkings/check-out/{receipt}", "AAA-1111-20250102-000000")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "customer", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isForbidden()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(403, responseBody.getStatus());
+        }
+
+        @Test
+        public void getAllByCpf_ValidCpf_ReturnCustomerParkingListWithOkStatus() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/parkings/cpf/77115870071")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isOk()
+                                .expectBodyList(PageableDto.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(1, responseBody.size());
+        }
+
+        @Test
+        public void getAllByCpf_AsCustomer_ReturnErrorMessageWithForbbidenStatus() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/parkings/cpf/77115870071")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "customer", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isForbidden()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(403, responseBody.getStatus());
         }
 
 }
