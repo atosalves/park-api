@@ -280,4 +280,38 @@ public class ParkingIT {
                 assertEquals(403, responseBody.getStatus());
         }
 
+        @Test
+        public void getAllByCustomerUserId_AsCustomer_ReturnCustomerParkingListWithOkStatus() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/parkings")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "customer", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isOk()
+                                .expectBodyList(PageableDto.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(1, responseBody.size());
+        }
+
+        @Test
+        public void getAllByCustomerUserId_AsAdmin_ReturnErrorMessageWithForbbidenStatus() {
+                var responseBody = webTestClient
+                                .get()
+                                .uri("/api/v1/parkings")
+                                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "admin", "123456"))
+                                .exchange()
+                                .expectStatus()
+                                .isForbidden()
+                                .expectBody(ErrorMessage.class)
+                                .returnResult()
+                                .getResponseBody();
+
+                assertNotNull(responseBody);
+                assertEquals(403, responseBody.getStatus());
+        }
+
 }
