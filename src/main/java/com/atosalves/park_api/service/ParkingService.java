@@ -32,7 +32,27 @@ public class ParkingService {
                 customerParkingSpot.setEntryAt(LocalDateTime.now());
                 customerParkingSpot.setReceipt(ParkingUtils.generateReceipt(customerParkingSpot.getLicensePlate()));
 
-                return customerParkingSpotService.create(customerParkingSpot);
+                return customerParkingSpotService.save(customerParkingSpot);
+        }
+
+        @Transactional
+        public CustomerParkingSpot checkOut(String receipt) {
+                var customerParkingSpot = customerParkingSpotService.getByReceipt(receipt);
+
+                var exitAt = LocalDateTime.now();
+                customerParkingSpot.setExitAt(exitAt);
+
+                var price = ParkingUtils.calculatePrice(customerParkingSpot.getEntryAt(), exitAt);
+                customerParkingSpot.setPrice(price);
+
+                long parkingCount = customerParkingSpotService
+                                .getCompletedParkingsCount(customerParkingSpot.getCustomer().getCpf());
+                var discount = ParkingUtils.calculateDiscount(price, parkingCount);
+                customerParkingSpot.setDiscount(discount);
+
+                customerParkingSpot.getParkingSpot().setStatus(ParkingSpot.StatusParkingSpot.AVAILABLE);
+
+                return customerParkingSpotService.save(customerParkingSpot);
         }
 
 }
