@@ -40,4 +40,9 @@ public class CustomerParkingSpotService {
                 return customerParkingSpotRepository.findAllByCustomerCpf(cpf, pageable);
         }
 
+        @Transactional(readOnly = true)
+        public Page<CustomerParkingSpot> getAllById(Long id, Pageable pageable) {
+                return customerParkingSpotRepository.findAllByCustomerUserId(id, pageable);
+        }
+
 }
