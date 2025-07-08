@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: park-api
+  web:
+    locale-resolver: fixed
+    locale: pt_BR
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://lcoalhost:3307/park_api?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Recife
+    username: user
+    password: password
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+    hibernate:
+      ddl-auto: update
+
+springdoc:
+  swagger-ui:
+    path: /docs-park.html
+  swagger-docs:
+    path: /docs-park
+  packagesToScan: com.atosalves.park_api.web.controller
