@@ -105,12 +105,12 @@ Este comando irá baixar a imagem do MySQL e iniciar o serviço na porta `3307` 
 1.  **Clone o Repositório** (se ainda não o fez):
 
     ```bash
-    git clone <URL_DO_SEU_REPOSITORIO>
+    git clone https://github.com/atosalves/park-api.git
     cd park-api
     ```
 
 2.  **Configurações do Banco de Dados**:
-    Certifique-se de que o arquivo `application.properties` (ou `application.yml`) em `src/main/resources` esteja configurado para conectar ao MySQL:
+    Certifique-se de que o arquivo `application.yml` em `src/main/resources` esteja configurado para conectar ao MySQL:
 
     ```properties
     spring.datasource.url=jdbc:mysql://localhost:3307/park_api
@@ -136,6 +136,6 @@ Este comando irá baixar a imagem do MySQL e iniciar o serviço na porta `3307` 
 
 Após iniciar a aplicação, você pode acessar a documentação interativa da API (Swagger UI) através do seguinte link:
 
-  * **[http://localhost:8080/swagger-ui.html](https://www.google.com/search?q=http://localhost:8080/swagger-ui.html)**
+  * **[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)**
 
 Aqui você poderá explorar todos os endpoints disponíveis, seus parâmetros, modelos de requisição/resposta e testá-los diretamente no navegador.
